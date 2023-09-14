@@ -4,30 +4,34 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sneakvels - Registro de Productos</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: bisque;
-      }
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-      }
-    </style>
+    <title>Sneaklo - Tienda de Sneakers</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
   </head>
   <body>
+    <nav class="navbar">
+      <div class="logo">Sneaklo</div>
+      <ul class="nav-links">
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Contacto</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#" id="carrito-icon">Carrito</a></li>
+      </ul>
+    </nav>
+
     <div class="container">
-      <h1>Sneakvels - Registro de Productos</h1>
-      <h2>Ordenar zapatillas en el catálogo</h2>
-      <h3>Productos:</h3>
-      <div id="productos"></div>
-      <!-- Aquí se mostrarán los productos generados por el script.js -->
-      <script type="text/javascript" src="app.js"></script>
+      <h1 class="titulo">Tienda Sneaklo</h1>
+
+      <div class="producto-grid" id="productos"></div>
     </div>
+
+    <div id="carrito" class="carrito-container">
+      <h2>Carrito de Compras</h2>
+      <ul id="carrito-list" class="carrito-list">
+        <li>El carrito está vacío.</li>
+      </ul>
+      <div class="total">Total: <span id="costoTotal"></span></div>
+    </div>
+
+    <script src="app.js"></script>
   </body>
 </html>

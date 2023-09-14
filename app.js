@@ -1,125 +1,127 @@
-class Producto {
-  constructor(nombre, precio, detalle, cantidad) {
-    this.nombre = nombre;
-    this.precio = parseFloat(precio);
-    this.detalle = detalle;
-    this.cantidad = parseInt(cantidad);
-    this.disponible = true;
-  }
+// Definir productos
+const productosJSON = [
+  {
+    nombre: "Imagen",
+    precio: 150,
+    detalle: "Producto",
+    tallas: [
+      "37",
+      "37.5",
+      "38",
+      "38.5",
+      "39",
+      "39.5",
+      "40",
+      "40.5",
+      "41",
+      "41.5",
+      "42",
+      "43",
+    ],
+    cantidad: 10,
+  },
+  // Agregar más productos aquí
+];
 
-  sumarIva() {
-    return this.precio * 1.21;
-  }
+let carrito = [];
+const carritoIcon = document.getElementById("carrito-icon");
+const carritoList = document.getElementById("carrito-list");
+const carritoContainer = document.getElementById("carrito");
+const productosContainer = document.getElementById("productos");
 
-  vender() {
-    this.disponible = false;
-  }
+carritoIcon.addEventListener("click", toggleCarrito);
 
-  precioSugerido() {
-    return this.precio * 1.21 * 1.25;
-  }
+function toggleCarrito() {
+  carritoContainer.classList.toggle("visible");
 }
 
-var arrayProductos = [];
-var continuar = true;
-
-do {
-  var comprobacion = prompt(
-    "Ingrese el modelo seleccionado o escriba 'fin' para terminar"
+// Función para agregar producto al carrito
+function agregarAlCarrito(producto) {
+  const productoExistente = carrito.find(
+    (p) => p.nombre === producto.nombre && p.talla === producto.talla
   );
 
-  if (comprobacion.toLowerCase() === "fin") {
-    continuar = false;
+  if (productoExistente) {
+    // Si el producto ya existe en el carrito, aumenta la cantidad
+    productoExistente.cantidad += producto.cantidad;
   } else {
-    var nombreP = comprobacion;
-    var precioP = prompt("Ingrese el precio del producto");
-    var detalleP = prompt("Ingrese el detalle del producto");
-    var cantidadP = prompt("Ingrese la cantidad comprada del producto");
-    arrayProductos.push(new Producto(nombreP, precioP, detalleP, cantidadP));
+    carrito.push(producto);
   }
-} while (continuar);
-
-console.log(arrayProductos);
-
-document.write("<h3>Lista de Productos:</h3>");
-
-for (var producto of arrayProductos) {
-  document.write("<ul><li><h3>Nombre: " + producto.nombre + "</h3></li>");
-  document.write("<li><h3>Detalle: " + producto.detalle + "</h3></li>");
-  document.write("<li><h3>Cantidad: " + producto.cantidad + "</h3></li>");
-  document.write("<li><h3>Precio: " + producto.precio + "</h3></li>");
-  document.write(
-    "<li><h3>Precio con IVA: " + producto.sumarIva() + "</h3></li></ul><br>"
-  );
+  actualizarCarrito();
 }
 
-var pocoStock = arrayProductos.filter((producto) => producto.cantidad <= 5);
-console.log(pocoStock);
-document.write(
-  "<h3>Lista de Productos con poco Stock (menos de 5 unidades):</h3>"
-);
+// Función para actualizar el contenido del carrito
+function actualizarCarrito() {
+  carritoList.innerHTML = "";
+  let costoTotal = 0;
 
-for (var producto of pocoStock) {
-  document.write("<ul><li><h3>Nombre: " + producto.nombre + "</h3></li>");
-  document.write("<li><h3>Detalle: " + producto.detalle + "</h3></li>");
-  document.write(
-    "<li><h3>Cantidad: " + producto.cantidad + "</h3></li></ul><br>"
-  );
+  carrito.forEach((producto) => {
+    const li = document.createElement("li");
+    li.textContent = `${producto.nombre} - Talla: ${producto.talla} - $${producto.precio} x ${producto.cantidad}`;
+    carritoList.appendChild(li);
+
+    costoTotal += producto.precio * producto.cantidad;
+  });
+
+  if (carrito.length === 0) {
+    carritoList.innerHTML = "<li>El carrito está vacío.</li>";
+  }
+
+  costoTotalSpan.textContent = `$${costoTotal}`;
+
+  // Guardar el carrito en el almacenamiento local (localStorage)
+  localStorage.setItem("carrito", JSON.stringify(carrito));
 }
 
-var sinStock = arrayProductos.filter(
-  (producto) => producto.cantidad === 0 || !producto.disponible
-);
-console.log(sinStock);
-document.write(
-  "<h3>Lista de Productos sin Stock (cantidad = 0 o disponible = false):</h3>"
-);
+// Recuperar el carrito desde el almacenamiento local al cargar la página
+window.addEventListener("load", () => {
+  const carritoGuardado = localStorage.getItem("carrito");
+  if (carritoGuardado) {
+    carrito = JSON.parse(carritoGuardado);
+    actualizarCarrito();
+  }
+});
 
-for (var producto of sinStock) {
-  document.write("<ul><li><h3>Nombre: " + producto.nombre + "</h3></li>");
-  document.write("<li><h3>Detalle: " + producto.detalle + "</h3></li>");
-  document.write(
-    "<li><h3>Cantidad: " + producto.cantidad + "</h3></li></ul><br>"
-  );
-}
+productosJSON.forEach((producto) => {
+  for (let i = 37; i <= 44; i++) {
+    const productoElement = document.createElement("div");
+    productoElement.classList.add("producto-item");
+    productoElement.innerHTML = `
+        <img src="imagen${i}.jpg" alt="${producto.nombre}">
+        <h3>${producto.nombre}</h3>
+        <p>${producto.detalle}</p>
+        <p>Precio: $${producto.precio}</p>
+        <label for="talla-${producto.nombre}-${i}">Seleccionar Talla:</label>
+        <select id="talla-${producto.nombre}-${i}" class="tallas">
+            ${producto.tallas
+              .map((talla) => `<option>${talla}</option>`)
+              .join("")}
+        </select>
+        <input type="number" class="cantidad" min="1" max="${
+          producto.cantidad
+        }" value="1">
+        <button class="agregarBtn">Agregar al Carrito</button>
+    `;
 
-var ingresado = prompt("Ingrese el producto que desea buscar");
-var prodIngresado = arrayProductos.filter((producto) =>
-  producto.nombre.includes(ingresado)
-);
-console.log(prodIngresado);
-document.write("<h3>Lista de Productos ingresados para búsqueda:</h3>");
+    const agregarBtn = productoElement.querySelector(".agregarBtn");
+    agregarBtn.addEventListener("click", () => {
+      const nombre = producto.nombre;
+      const precio = parseFloat(producto.precio);
+      const cantidad = parseInt(
+        productoElement.querySelector(".cantidad").value
+      );
+      const talla = productoElement.querySelector(".tallas").value;
 
-for (var producto of prodIngresado) {
-  document.write("<ul><li><h3>Nombre: " + producto.nombre + "</h3></li>");
-  document.write("<li><h3>Detalle: " + producto.detalle + "</h3></li>");
-  document.write("<li><h3>Precio: " + producto.precio + "</h3></li></ul><br>");
-}
+      agregarAlCarrito({
+        nombre,
+        precio,
+        cantidad,
+        talla,
+      });
+    });
 
-var ordenadosCantidad = arrayProductos
-  .slice()
-  .sort((a, b) => a.cantidad - b.cantidad);
-console.log("Ordenados por cantidad Ascendente:");
-console.log(ordenadosCantidad);
-document.write("<h3>Lista de Productos ordenados por cantidad:</h3>");
+    productosContainer.appendChild(productoElement);
+  }
+});
 
-for (var producto of ordenadosCantidad) {
-  document.write("<ul><li><h3>Nombre: " + producto.nombre + "</h3></li>");
-  document.write("<li><h3>Detalle: " + producto.detalle + "</h3></li>");
-  document.write(
-    "<li><h3>Cantidad: " + producto.cantidad + "</h3></li></ul><br>"
-  );
-}
-
-var ordenadosPrecio = arrayProductos
-  .slice()
-  .sort((a, b) => a.precio - b.precio);
-console.log("Ordenados por Precios Ascendentes");
-console.log(ordenadosPrecio);
-document.write("<h3>Lista de Productos ordenados por Precio Ascendente:</h3>");
-
-for (var producto of ordenadosPrecio) {
-  document.write("<ul><li><h3>Nombre: " + producto.nombre + "</h3></li>");
-  document.write("<li><h3>Detalle: " + producto.detalle + "</h3></li>");
-  document.write("<li><h3>Precio: " + producto.precio + "</h3></li></ul><br>");
-}
+const costoTotalSpan = document.getElementById("costoTotal");
